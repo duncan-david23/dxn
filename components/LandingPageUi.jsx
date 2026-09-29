@@ -69,14 +69,33 @@ export default function LandingPageUi() {
     return () => window.removeEventListener("scroll", handleParallax);
   }, []);
 
+  // Lock body scroll when mobile menu open + close on resize to desktop
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    const handleResize = () => {
+      if (window.innerWidth > 900 && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+        document.body.style.overflow = "";
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
-    document.body.style.overflow = mobileMenuOpen ? "" : "hidden";
   };
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
-    document.body.style.overflow = "";
   };
 
   return (
@@ -105,6 +124,7 @@ export default function LandingPageUi() {
         }
         html {
           scroll-behavior: smooth;
+          overflow-x: hidden;
         }
         body {
           background: var(--bg);
@@ -173,10 +193,11 @@ export default function LandingPageUi() {
           margin: 0 auto;
           padding: 0 48px;
         }
-        @media (max-width: 720px) {
-          .wrap {
-            padding: 0 24px;
-          }
+        @media (max-width: 900px) {
+          .wrap { padding: 0 24px; }
+        }
+        @media (max-width: 480px) {
+          .wrap { padding: 0 18px; }
         }
 
         /* ---------- NAV ---------- */
@@ -202,6 +223,7 @@ export default function LandingPageUi() {
           display: flex;
           align-items: center;
           justify-content: space-between;
+          gap: 20px;
         }
         .logo {
           font-family: var(--font-head);
@@ -211,6 +233,7 @@ export default function LandingPageUi() {
           display: flex;
           align-items: center;
           gap: 9px;
+          flex-shrink: 0;
         }
         .logo .dot {
           width: 7px;
@@ -265,6 +288,11 @@ export default function LandingPageUi() {
           gap: 5px;
           cursor: pointer;
           z-index: 600;
+          padding: 8px;
+          margin: -8px;
+          background: transparent;
+          border: none;
+          flex-shrink: 0;
         }
         .burger span {
           width: 26px;
@@ -272,6 +300,15 @@ export default function LandingPageUi() {
           background: var(--white);
           display: block;
           transition: 0.3s;
+        }
+        .burger.open span:nth-child(1) {
+          transform: translateY(6px) rotate(45deg);
+        }
+        .burger.open span:nth-child(2) {
+          opacity: 0;
+        }
+        .burger.open span:nth-child(3) {
+          transform: translateY(-6px) rotate(-45deg);
         }
         @media (max-width: 900px) {
           nav.primary,
@@ -283,7 +320,7 @@ export default function LandingPageUi() {
           }
         }
 
-        /* mobile menu */
+        /* mobile menu — scrollable */
         .mobile-menu {
           position: fixed;
           inset: 0;
@@ -291,27 +328,46 @@ export default function LandingPageUi() {
           z-index: 490;
           display: flex;
           flex-direction: column;
-          justify-content: center;
-          padding: 0 32px;
+          justify-content: flex-start;
+          padding: 100px 24px 40px;
           transform: translateY(-100%);
           transition: transform 0.5s cubic-bezier(0.7, 0, 0.2, 1);
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
         }
         .mobile-menu.open {
           transform: translateY(0);
         }
         .mobile-menu a {
           font-family: var(--font-head);
-          font-size: 38px;
+          font-size: 32px;
           font-weight: 600;
-          padding: 14px 0;
+          padding: 16px 0;
           border-bottom: 1px solid var(--line);
           color: var(--white);
+          line-height: 1.1;
+          flex-shrink: 0;
         }
         .mobile-menu .mm-contact {
           margin-top: 28px;
           color: var(--emerald-bright);
           font-family: var(--font-mono);
           font-size: 15px;
+          border-bottom: none;
+        }
+        @media (max-width: 480px) {
+          .mobile-menu {
+            padding: 88px 20px 32px;
+          }
+          .mobile-menu a {
+            font-size: 26px;
+            padding: 14px 0;
+          }
+        }
+        @media (max-width: 360px) {
+          .mobile-menu a {
+            font-size: 22px;
+          }
         }
 
         /* ---------- HERO ---------- */
@@ -353,6 +409,11 @@ export default function LandingPageUi() {
             black,
             transparent 75%
           );
+          -webkit-mask-image: radial-gradient(
+            ellipse 70% 60% at 60% 40%,
+            black,
+            transparent 75%
+          );
         }
         .hero-inner {
           position: relative;
@@ -366,12 +427,16 @@ export default function LandingPageUi() {
           padding: 0 48px;
           margin-bottom: 56px;
         }
-        @media (max-width: 720px) {
+        @media (max-width: 900px) {
           .hero-top {
             padding: 0 24px;
             flex-direction: column;
-            gap: 18px;
+            gap: 12px;
+            margin-bottom: 36px;
           }
+        }
+        @media (max-width: 480px) {
+          .hero-top { padding: 0 18px; }
         }
         .eyebrow-mono {
           font-family: var(--font-mono);
@@ -381,25 +446,39 @@ export default function LandingPageUi() {
           display: flex;
           align-items: center;
           gap: 10px;
+          line-height: 1.5;
+          flex-wrap: wrap;
         }
         .eyebrow-mono .bar {
           width: 26px;
           height: 1px;
           background: var(--emerald);
           display: inline-block;
+          flex-shrink: 0;
+        }
+        @media (max-width: 480px) {
+          .eyebrow-mono {
+            font-size: 10.5px;
+            letter-spacing: 0.04em;
+          }
         }
         .hero-headline {
           font-family: var(--font-head);
           font-weight: 700;
-          font-size: clamp(44px, 8vw, 118px);
-          line-height: 0.98;
+          font-size: clamp(38px, 8vw, 118px);
+          line-height: 1;
           letter-spacing: -0.02em;
-          padding: 0 40px;
+          padding: 0 48px;
           max-width: 1300px;
+          word-break: break-word;
         }
-        @media (max-width: 720px) {
+        @media (max-width: 900px) {
+          .hero-headline { padding: 0 24px; }
+        }
+        @media (max-width: 480px) {
           .hero-headline {
-            padding: 0 24px;
+            padding: 0 18px;
+            font-size: clamp(32px, 11vw, 56px);
           }
         }
         .hero-headline .line {
@@ -432,12 +511,18 @@ export default function LandingPageUi() {
           justify-content: space-between;
           align-items: flex-end;
           gap: 40px;
-          padding: 56px 40px 64px;
+          padding: 56px 48px 64px;
           flex-wrap: wrap;
         }
-        @media (max-width: 720px) {
+        @media (max-width: 900px) {
           .hero-sub-row {
             padding: 36px 24px 48px;
+            gap: 24px;
+          }
+        }
+        @media (max-width: 480px) {
+          .hero-sub-row {
+            padding: 28px 18px 40px;
           }
         }
         .hero-sub {
@@ -445,11 +530,23 @@ export default function LandingPageUi() {
           color: var(--gray);
           font-size: 16px;
           line-height: 1.6;
+          flex: 1 1 280px;
+        }
+        @media (max-width: 480px) {
+          .hero-sub {
+            font-size: 15px;
+          }
         }
         .hero-actions {
           display: flex;
           gap: 14px;
           flex-wrap: wrap;
+        }
+        @media (max-width: 480px) {
+          .hero-actions {
+            width: 100%;
+            gap: 10px;
+          }
         }
         .btn {
           font-size: 13.5px;
@@ -460,6 +557,14 @@ export default function LandingPageUi() {
           transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
             background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
           display: inline-block;
+          text-align: center;
+        }
+        @media (max-width: 480px) {
+          .hero-actions .btn {
+            flex: 1 1 auto;
+            padding: 14px 20px;
+            font-size: 13px;
+          }
         }
         .btn-solid {
           background: var(--white);
@@ -577,8 +682,8 @@ export default function LandingPageUi() {
         }
         @media (max-width: 900px) {
           .hero-visual {
-            height: 44vh;
-            min-height: 320px;
+            height: 42vh;
+            min-height: 280px;
           }
           .spec-tag {
             display: none;
@@ -587,6 +692,20 @@ export default function LandingPageUi() {
             right: 0;
             left: 0;
             margin: 0 auto;
+            width: min(88%, 520px);
+          }
+        }
+        @media (max-width: 480px) {
+          .hero-visual {
+            height: 36vh;
+            min-height: 220px;
+          }
+          .rig {
+            width: 94%;
+          }
+          .ghost-bot {
+            width: 50px;
+            left: 8%;
           }
         }
 
@@ -604,6 +723,11 @@ export default function LandingPageUi() {
           font-size: 10.5px;
           color: var(--gray-dim);
           letter-spacing: 0.08em;
+        }
+        @media (max-width: 900px) {
+          .scroll-cue {
+            display: none;
+          }
         }
         .scroll-cue .stem {
           width: 1px;
@@ -636,10 +760,11 @@ export default function LandingPageUi() {
           position: relative;
           padding: 150px 0;
         }
-        @media (max-width: 720px) {
-          section {
-            padding: 96px 0;
-          }
+        @media (max-width: 900px) {
+          section { padding: 90px 0; }
+        }
+        @media (max-width: 480px) {
+          section { padding: 72px 0; }
         }
         .section-head {
           display: flex;
@@ -649,10 +774,16 @@ export default function LandingPageUi() {
           margin-bottom: 80px;
           flex-wrap: wrap;
         }
+        @media (max-width: 900px) {
+          .section-head {
+            margin-bottom: 48px;
+            gap: 20px;
+          }
+        }
         .section-title {
           font-family: var(--font-head);
           font-weight: 600;
-          font-size: clamp(30px, 4.4vw, 54px);
+          font-size: clamp(28px, 4.4vw, 54px);
           letter-spacing: -0.01em;
           line-height: 1.08;
           max-width: 680px;
@@ -726,10 +857,17 @@ export default function LandingPageUi() {
           padding: 5px 10px;
           border-radius: 2px;
         }
-        @media (max-width: 760px) {
+        @media (max-width: 900px) {
           .frontier-row {
             grid-template-columns: 1fr;
             gap: 12px;
+            padding: 40px 0;
+          }
+          .frontier-num {
+            padding-top: 0;
+          }
+          .frontier-desc {
+            padding-top: 0;
           }
         }
 
@@ -841,6 +979,14 @@ export default function LandingPageUi() {
             min-height: auto;
           }
         }
+        @media (max-width: 480px) {
+          .division-body {
+            padding: 24px 24px 28px;
+          }
+          .division-title {
+            font-size: 22px;
+          }
+        }
 
         /* cart (robotics scene) */
         .wheel-spoke {
@@ -902,7 +1048,7 @@ export default function LandingPageUi() {
         @media (max-width: 960px) {
           .tech-section .wrap {
             grid-template-columns: 1fr;
-            gap: 56px;
+            gap: 48px;
           }
         }
         .tech-copy p {
@@ -926,13 +1072,23 @@ export default function LandingPageUi() {
           font-family: var(--font-mono);
           font-size: 13px;
           color: var(--gray);
+          gap: 12px;
         }
         .stack-item span:last-child {
           color: var(--gray-dim);
+          text-align: right;
+        }
+        @media (max-width: 480px) {
+          .stack-item {
+            font-size: 11.5px;
+          }
         }
         .node-diagram {
           position: relative;
           aspect-ratio: 1/0.82;
+          max-width: 520px;
+          margin: 0 auto;
+          width: 100%;
         }
 
         /* ---------- MISSION / VISION ---------- */
@@ -947,6 +1103,7 @@ export default function LandingPageUi() {
           .mission-vision-grid {
             grid-template-columns: 1fr;
             gap: 44px;
+            padding-bottom: 60px;
           }
         }
         .mv-num {
@@ -972,6 +1129,9 @@ export default function LandingPageUi() {
         .leadership {
           padding-top: 90px;
         }
+        @media (max-width: 900px) {
+          .leadership { padding-top: 60px; }
+        }
         .leader-card {
           display: flex;
           gap: 48px;
@@ -985,7 +1145,7 @@ export default function LandingPageUi() {
           .leader-card {
             flex-direction: column;
             gap: 28px;
-            padding: 32px;
+            padding: 32px 24px;
           }
         }
         .leader-portrait {
@@ -1004,6 +1164,12 @@ export default function LandingPageUi() {
             ),
             var(--bg);
         }
+        @media (max-width: 480px) {
+          .leader-portrait {
+            width: 110px;
+            height: 110px;
+          }
+        }
         .leader-portrait svg {
           width: 100%;
           height: 100%;
@@ -1013,6 +1179,9 @@ export default function LandingPageUi() {
           font-weight: 600;
           font-size: 28px;
           letter-spacing: -0.01em;
+        }
+        @media (max-width: 480px) {
+          .leader-name { font-size: 22px; }
         }
         .leader-title {
           color: var(--gray-dim);
@@ -1045,10 +1214,13 @@ export default function LandingPageUi() {
           text-align: center;
           padding: 180px 0;
         }
+        @media (max-width: 900px) {
+          .statement { padding: 90px 0; }
+        }
         .statement-text {
           font-family: var(--font-head);
           font-weight: 600;
-          font-size: clamp(28px, 5vw, 58px);
+          font-size: clamp(26px, 5vw, 58px);
           line-height: 1.15;
           letter-spacing: -0.01em;
           max-width: 980px;
@@ -1079,17 +1251,44 @@ export default function LandingPageUi() {
           flex-wrap: wrap;
           padding: 100px 0;
         }
+        @media (max-width: 900px) {
+          .cta-inner {
+            padding: 60px 0;
+            gap: 28px;
+            flex-direction: column;
+            align-items: flex-start;
+          }
+        }
         .cta-title {
           font-family: var(--font-head);
           font-weight: 600;
-          font-size: clamp(34px, 5vw, 64px);
+          font-size: clamp(30px, 5vw, 64px);
           letter-spacing: -0.01em;
           max-width: 640px;
+        }
+        .cta-inner .btn {
+          flex: 0 0 auto;
+          white-space: nowrap;
+          max-width: 100%;
+        }
+        @media (max-width: 900px) {
+          .cta-inner .btn {
+            width: auto;
+            align-self: flex-start;
+          }
+        }
+        @media (max-width: 480px) {
+          .cta-inner .btn {
+            width: 100%;
+          }
         }
 
         /* ---------- FOOTER ---------- */
         footer {
           padding: 70px 0 40px;
+        }
+        @media (max-width: 900px) {
+          footer { padding: 50px 0 30px; }
         }
         .footer-top {
           display: grid;
@@ -1098,9 +1297,17 @@ export default function LandingPageUi() {
           padding-bottom: 60px;
           border-bottom: 1px solid var(--line);
         }
-        @media (max-width: 860px) {
+        @media (max-width: 900px) {
           .footer-top {
             grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            padding-bottom: 40px;
+          }
+        }
+        @media (max-width: 480px) {
+          .footer-top {
+            grid-template-columns: 1fr;
+            gap: 28px;
           }
         }
         .footer-col h4 {
@@ -1137,6 +1344,12 @@ export default function LandingPageUi() {
           flex-wrap: wrap;
           gap: 12px;
         }
+        @media (max-width: 480px) {
+          .footer-bottom {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+        }
       `}</style>
 
       <div className="grain"></div>
@@ -1152,18 +1365,22 @@ export default function LandingPageUi() {
             <Link href="/autonomous">Autonomous Systems</Link>
             <Link href="/software">Software</Link>
             <Link href="/#industries">Industries</Link>
-            {/* <Link href="/#research">Research</Link> */}
             <Link href="/#company">Company</Link>
             <Link href="/#careers">Careers</Link>
           </nav>
           <Link href="/#contact" className="nav-cta" data-hover>
             Contact
           </Link>
-          <div className="burger" onClick={toggleMobileMenu}>
+          <button
+            className={`burger ${mobileMenuOpen ? "open" : ""}`}
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+          >
             <span></span>
             <span></span>
             <span></span>
-          </div>
+          </button>
         </div>
       </header>
 
@@ -1179,9 +1396,6 @@ export default function LandingPageUi() {
         </Link>
         <Link href="/#industries" onClick={closeMobileMenu}>
           Industries
-        </Link>
-        <Link href="/#research" onClick={closeMobileMenu}>
-          Research
         </Link>
         <Link href="/#company" onClick={closeMobileMenu}>
           Company
@@ -1244,35 +1458,13 @@ export default function LandingPageUi() {
               data-hover-img
             >
               <defs>
-                <linearGradient
-                  id="rigGrad"
-                  x1="0"
-                  y1="0"
-                  x2="1"
-                  y2="1"
-                >
-                  <stop
-                    offset="0%"
-                    stopColor="#3fe0a6"
-                    stopOpacity="0.95"
-                  />
-                  <stop
-                    offset="100%"
-                    stopColor="#1fae7a"
-                    stopOpacity="0.3"
-                  />
+                <linearGradient id="rigGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#3fe0a6" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#1fae7a" stopOpacity="0.3" />
                 </linearGradient>
                 <radialGradient id="rotorGlow" cx="50%" cy="50%" r="50%">
-                  <stop
-                    offset="0%"
-                    stopColor="#3fe0a6"
-                    stopOpacity="0.5"
-                  />
-                  <stop
-                    offset="100%"
-                    stopColor="#3fe0a6"
-                    stopOpacity="0"
-                  />
+                  <stop offset="0%" stopColor="#3fe0a6" stopOpacity="0.5" />
+                  <stop offset="100%" stopColor="#3fe0a6" stopOpacity="0" />
                 </radialGradient>
                 <linearGradient id="podGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#1a201c" />
@@ -1280,20 +1472,12 @@ export default function LandingPageUi() {
                 </linearGradient>
               </defs>
 
-              {/* ambient rotor glow discs */}
               <circle cx="120" cy="110" r="66" fill="url(#rotorGlow)" />
               <circle cx="500" cy="110" r="66" fill="url(#rotorGlow)" />
               <circle cx="120" cy="300" r="66" fill="url(#rotorGlow)" />
               <circle cx="500" cy="300" r="66" fill="url(#rotorGlow)" />
 
-              {/* rotor rings (4) */}
-              <circle
-                cx="120"
-                cy="110"
-                r="58"
-                stroke="#3a4640"
-                strokeWidth="1.2"
-              />
+              <circle cx="120" cy="110" r="58" stroke="#3a4640" strokeWidth="1.2" />
               <circle
                 cx="120"
                 cy="110"
@@ -1302,13 +1486,7 @@ export default function LandingPageUi() {
                 strokeWidth="1.2"
                 strokeDasharray="8 300"
               />
-              <circle
-                cx="500"
-                cy="110"
-                r="58"
-                stroke="#3a4640"
-                strokeWidth="1.2"
-              />
+              <circle cx="500" cy="110" r="58" stroke="#3a4640" strokeWidth="1.2" />
               <circle
                 cx="500"
                 cy="110"
@@ -1317,13 +1495,7 @@ export default function LandingPageUi() {
                 strokeWidth="1.2"
                 strokeDasharray="8 300"
               />
-              <circle
-                cx="120"
-                cy="300"
-                r="58"
-                stroke="#3a4640"
-                strokeWidth="1.2"
-              />
+              <circle cx="120" cy="300" r="58" stroke="#3a4640" strokeWidth="1.2" />
               <circle
                 cx="120"
                 cy="300"
@@ -1332,13 +1504,7 @@ export default function LandingPageUi() {
                 strokeWidth="1.2"
                 strokeDasharray="8 300"
               />
-              <circle
-                cx="500"
-                cy="300"
-                r="58"
-                stroke="#3a4640"
-                strokeWidth="1.2"
-              />
+              <circle cx="500" cy="300" r="58" stroke="#3a4640" strokeWidth="1.2" />
               <circle
                 cx="500"
                 cy="300"
@@ -1348,7 +1514,6 @@ export default function LandingPageUi() {
                 strokeDasharray="8 300"
               />
 
-              {/* rotor blades (thin cross inside each ring), spinning */}
               <g className="blade" stroke="#5c6560" strokeWidth="1">
                 <line x1="70" y1="110" x2="170" y2="110" />
                 <line x1="120" y1="60" x2="120" y2="160" />
@@ -1370,7 +1535,6 @@ export default function LandingPageUi() {
               <circle cx="120" cy="300" r="5" fill="#3fe0a6" />
               <circle cx="500" cy="300" r="5" fill="#3fe0a6" />
 
-              {/* arms connecting rotors to central pod */}
               <g stroke="#3a4640" strokeWidth="1.6">
                 <line x1="164" y1="140" x2="262" y2="182" />
                 <line x1="456" y1="140" x2="358" y2="182" />
@@ -1378,17 +1542,14 @@ export default function LandingPageUi() {
                 <line x1="456" y1="270" x2="358" y2="228" />
               </g>
 
-              {/* central pod / fuselage */}
               <path
                 d="M262 182 L358 182 L378 205 L358 228 L262 228 L242 205 Z"
                 fill="url(#podGrad)"
                 stroke="url(#rigGrad)"
                 strokeWidth="1.6"
               />
-              {/* sensor dome */}
               <circle cx="310" cy="205" r="16" stroke="#3fe0a6" strokeWidth="1.3" />
               <circle cx="310" cy="205" r="5" fill="#3fe0a6" />
-              {/* antenna / camera gimbal */}
               <line
                 x1="310"
                 y1="228"
@@ -1408,7 +1569,6 @@ export default function LandingPageUi() {
               />
               <circle cx="353" cy="156" r="2.6" fill="#3fe0a6" />
 
-              {/* fine registration lines */}
               <line
                 x1="310"
                 y1="80"
@@ -1453,22 +1613,8 @@ export default function LandingPageUi() {
                 stroke="#8b968f"
                 strokeWidth="1"
               />
-              <line
-                x1="20"
-                y1="74"
-                x2="20"
-                y2="88"
-                stroke="#8b968f"
-                strokeWidth="1"
-              />
-              <line
-                x1="40"
-                y1="74"
-                x2="40"
-                y2="88"
-                stroke="#8b968f"
-                strokeWidth="1"
-              />
+              <line x1="20" y1="74" x2="20" y2="88" stroke="#8b968f" strokeWidth="1" />
+              <line x1="40" y1="74" x2="40" y2="88" stroke="#8b968f" strokeWidth="1" />
             </svg>
 
             <div className="spec-tag t1">
@@ -1547,6 +1693,7 @@ export default function LandingPageUi() {
                 <span>Enterprise</span>
                 <span>Analytics</span>
                 <span>Logistics</span>
+                <span>AI Systems</span>
               </div>
             </div>
             <div className="frontier-desc">
@@ -1583,21 +1730,8 @@ export default function LandingPageUi() {
                     <rect x="-30" y="74" width="60" height="26" rx="4" />
                     <rect x="-16" y="58" width="32" height="18" rx="3" />
                   </g>
-                  <line
-                    x1="0"
-                    y1="58"
-                    x2="0"
-                    y2="46"
-                    stroke="#3a4640"
-                    strokeWidth="1.2"
-                  />
-                  <circle
-                    className="status-blink"
-                    cx="0"
-                    cy="43"
-                    r="2.6"
-                    fill="#3fe0a6"
-                  />
+                  <line x1="0" y1="58" x2="0" y2="46" stroke="#3a4640" strokeWidth="1.2" />
+                  <circle className="status-blink" cx="0" cy="43" r="2.6" fill="#3fe0a6" />
                   <g>
                     <circle
                       cx="-17"
@@ -1639,9 +1773,7 @@ export default function LandingPageUi() {
             </div>
             <div className="division-body">
               <div className="division-index mono">ROBOTICS</div>
-              <div className="division-title">
-                The next generation of machines.
-              </div>
+              <div className="division-title">The next generation of machines.</div>
               <p className="division-desc">
                 Humanoid, household, delivery, and specialized robots designed
                 for the physical world.
@@ -1683,11 +1815,7 @@ export default function LandingPageUi() {
                     <line x1="98" y1="80" x2="146" y2="80" />
                     <line x1="122" y1="56" x2="122" y2="104" />
                   </g>
-                  <g
-                    className="blade blade-fast"
-                    stroke="#5c6560"
-                    strokeWidth="1"
-                  >
+                  <g className="blade blade-fast" stroke="#5c6560" strokeWidth="1">
                     <line x1="254" y1="80" x2="302" y2="80" />
                     <line x1="278" y1="56" x2="278" y2="104" />
                   </g>
@@ -1710,10 +1838,7 @@ export default function LandingPageUi() {
           <Link href="/software" className="division-card" data-hover>
             <div className="division-glow"></div>
             <div className="division-scene">
-              <svg
-                viewBox="0 0 400 160"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg">
                 <g stroke="#233029" strokeWidth="1">
                   <line x1="200" y1="80" x2="90" y2="40" />
                   <line x1="200" y1="80" x2="310" y2="40" />
@@ -1883,13 +2008,7 @@ export default function LandingPageUi() {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <circle
-                cx="240"
-                cy="210"
-                r="52"
-                stroke="#3fe0a6"
-                strokeWidth="1.2"
-              />
+              <circle cx="240" cy="210" r="52" stroke="#3fe0a6" strokeWidth="1.2" />
               <circle cx="240" cy="210" r="5" fill="#3fe0a6" />
               <g stroke="#2a332d" strokeWidth="1">
                 <line x1="240" y1="158" x2="240" y2="40" />
@@ -1940,48 +2059,24 @@ export default function LandingPageUi() {
       <section id="industries" style={{ paddingTop: 0 }}>
         <div className="wrap">
           <div className="section-head reveal">
-            <h2 className="section-title">
-              Built to operate across industries.
-            </h2>
+            <h2 className="section-title">Built to operate across industries.</h2>
             <p className="section-note">
               Logistics. Manufacturing. Agriculture. Healthcare. Retail.
               Residential. Security. Defense. Enterprise. Infrastructure. Insurance
             </p>
           </div>
           <div className="frontier-tags reveal" style={{ gap: "12px" }}>
-            <span style={{ fontSize: "13px", padding: "10px 16px" }}>
-              Logistics
-            </span>
-            <span style={{ fontSize: "13px", padding: "10px 16px" }}>
-              Manufacturing
-            </span>
-            <span style={{ fontSize: "13px", padding: "10px 16px" }}>
-              Agriculture
-            </span>
-            <span style={{ fontSize: "13px", padding: "10px 16px" }}>
-              Healthcare
-            </span>
-            <span style={{ fontSize: "13px", padding: "10px 16px" }}>
-              Retail
-            </span>
-            <span style={{ fontSize: "13px", padding: "10px 16px" }}>
-              Residential
-            </span>
-            <span style={{ fontSize: "13px", padding: "10px 16px" }}>
-              Security
-            </span>
-            <span style={{ fontSize: "13px", padding: "10px 16px" }}>
-              Defense
-            </span>
-            <span style={{ fontSize: "13px", padding: "10px 16px" }}>
-              Enterprise
-            </span>
-            <span style={{ fontSize: "13px", padding: "10px 16px" }}>
-              Infrastructure
-            </span>
-            <span style={{ fontSize: "13px", padding: "10px 16px" }}>
-              Insurance
-            </span>
+            <span style={{ fontSize: "13px", padding: "10px 16px" }}>Logistics</span>
+            <span style={{ fontSize: "13px", padding: "10px 16px" }}>Manufacturing</span>
+            <span style={{ fontSize: "13px", padding: "10px 16px" }}>Agriculture</span>
+            <span style={{ fontSize: "13px", padding: "10px 16px" }}>Healthcare</span>
+            <span style={{ fontSize: "13px", padding: "10px 16px" }}>Retail</span>
+            <span style={{ fontSize: "13px", padding: "10px 16px" }}>Residential</span>
+            <span style={{ fontSize: "13px", padding: "10px 16px" }}>Security</span>
+            <span style={{ fontSize: "13px", padding: "10px 16px" }}>Defense</span>
+            <span style={{ fontSize: "13px", padding: "10px 16px" }}>Enterprise</span>
+            <span style={{ fontSize: "13px", padding: "10px 16px" }}>Infrastructure</span>
+            <span style={{ fontSize: "13px", padding: "10px 16px" }}>Insurance</span>
           </div>
         </div>
       </section>
@@ -2026,18 +2121,8 @@ export default function LandingPageUi() {
             </div>
             <div className="leader-card">
               <div className="leader-portrait">
-                <svg
-                  viewBox="0 0 150 150"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle
-                    cx="75"
-                    cy="75"
-                    r="60"
-                    stroke="#2a332d"
-                    strokeWidth="1"
-                  />
+                <svg viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="75" cy="75" r="60" stroke="#2a332d" strokeWidth="1" />
                   <circle
                     cx="75"
                     cy="75"
@@ -2133,7 +2218,6 @@ export default function LandingPageUi() {
             <div className="footer-col">
               <h4>COMPANY</h4>
               <Link href="/#company">About</Link>
-              <Link href="/#research">Research</Link>
               <Link href="/#careers">Careers</Link>
             </div>
             <div className="footer-col">

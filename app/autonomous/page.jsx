@@ -1,4 +1,5 @@
 import AutonomousClient from "../../components/AutonomousClient";
+import PageGate from "../../components/PageGate";
 
 export const metadata = {
   title: "Autonomous Systems — DURXAN | Aerial & Ground Autonomy",
@@ -33,5 +34,9 @@ export const metadata = {
 };
 
 export default function AutonomousPage() {
-  return <AutonomousClient />;
+  return (
+    
+      <AutonomousClient />
+   
+  );
 }

@@ -24,82 +24,9 @@ const products = [
     externalUrl: "#",
     externalLabel: "claukkinventory.app",
   },
-  // {
-  //   index: "02",
-  //   name: "Ledgerly",
-  //   category: "BOOKKEEPING & ACCOUNTING",
-  //   tagline: "Books that close themselves.",
-  //   description:
-  //     "Modern bookkeeping platform for small businesses and accountants. Automated categorization, bank reconciliation, invoicing, tax prep, and clean financial statements.",
-  //   features: [
-  //     "Auto bank reconciliation",
-  //     "AI expense categorization",
-  //     "Invoicing & payment tracking",
-  //     "Tax-ready reports",
-  //     "Multi-currency support",
-  //     "Accountant collaboration",
-  //   ],
-  //   audience: "SMBs / Accountants / Freelancers",
-  //   cta: "View",
-  //   externalUrl: "#",
-  //   externalLabel: "ledgerly.io",
-  // },
-  // {
-  //   index: "03",
-  //   name: "AegisShield",
-  //   category: "CYBERSECURITY",
-  //   tagline: "Enterprise security for everyone else.",
-  //   description:
-  //     "Cybersecurity suite for small and mid-sized businesses. Endpoint protection, threat detection, phishing defense, password management, and compliance monitoring — without the enterprise price tag.",
-  //   features: [
-  //     "Endpoint threat detection",
-  //     "Phishing & email defense",
-  //     "Password vault & 2FA",
-  //     "Vulnerability scanning",
-  //     "Compliance dashboards",
-  //     "Incident response alerts",
-  //   ],
-  //   audience: "SMBs / Professional Services",
-  //   cta: "View",
-  //   externalUrl: "#",
-  //   externalLabel: "aegisshield.com",
-  // },
-  // {
-  //   index: "04",
-  //   name: "FlowDesk",
-  //   category: "CUSTOMER SUPPORT",
-  //   tagline: "Support that scales with you.",
-  //   description:
-  //     "Help desk and customer support platform with ticketing, live chat, knowledge base, and AI-assisted responses. Built for teams that care about response time.",
-  //   features: [
-  //     "Unified ticket inbox",
-  //     "Live chat & email",
-  //     "Knowledge base builder",
-  //     "AI reply suggestions",
-  //     "SLA & analytics",
-  //     "Team collaboration",
-  //   ],
-  //   audience: "Support Teams / SaaS / E-commerce",
-  //   cta: "View",
-  //   externalUrl: "#",
-  //   externalLabel: "flowdesk.app",
-  // },
 ];
 
 const clientProjects = [
-  // {
-  //   index: "01",
-  //   client: "Meridian Ports Authority",
-  //   sector: "MARITIME / INFRASTRUCTURE",
-  //   region: "APAC",
-  //   app: "PortFlow OS",
-  //   type: "Custom Operations Platform",
-  //   description:
-  //     "A unified port operations system coordinating vessel scheduling, cargo tracking, customs integration, and berth allocation across 12 terminals.",
-  //   stack: ["React", "Node.js", "PostgreSQL", "Kafka"],
-  //   duration: "14 months",
-  //   status: "LIVE",
-  // },
   {
     index: "01",
     client: "Havenport Health",
@@ -113,58 +40,6 @@ const clientProjects = [
     duration: "11 months",
     status: "LIVE",
   },
-  // {
-  //   index: "03",
-  //   client: "Orion Financial Group",
-  //   sector: "FINANCE",
-  //   region: "GLOBAL",
-  //   app: "Orion Risk Console",
-  //   type: "Risk & Compliance Platform",
-  //   description:
-  //     "Real-time risk monitoring and regulatory compliance dashboard for a multi-billion dollar portfolio across 18 markets.",
-  //   stack: ["React", "Go", "TimescaleDB", "gRPC"],
-  //   duration: "9 months",
-  //   status: "LIVE",
-  // },
-  // {
-  //   index: "04",
-  //   client: "Vanguard Retail Holdings",
-  //   sector: "RETAIL",
-  //   region: "EMEA",
-  //   app: "Vanguard Commerce Hub",
-  //   type: "Omnichannel Retail Platform",
-  //   description:
-  //     "Unified commerce backend connecting 320 stores, e-commerce, and mobile app — with shared inventory, pricing, and loyalty across all channels.",
-  //   stack: ["Next.js", "NestJS", "Redis", "Stripe"],
-  //   duration: "16 months",
-  //   status: "LIVE",
-  // },
-  // {
-  //   index: "05",
-  //   client: "Sierra Grid Authority",
-  //   sector: "ENERGY / INFRASTRUCTURE",
-  //   region: "LATAM",
-  //   app: "GridPulse",
-  //   type: "Grid Monitoring & Analytics",
-  //   description:
-  //     "Real-time monitoring and predictive analytics for a national power grid — detecting anomalies and forecasting demand across 4,000+ substations.",
-  //   stack: ["React", "Python", "InfluxDB", "TensorFlow"],
-  //   duration: "12 months",
-  //   status: "LIVE",
-  // },
-  // {
-  //   index: "06",
-  //   client: "Aegis Logistics Group",
-  //   sector: "LOGISTICS",
-  //   region: "APAC",
-  //   app: "Aegis Route Engine",
-  //   type: "Fleet Routing & Dispatch",
-  //   description:
-  //     "Dynamic routing and dispatch platform managing 8,000+ vehicles with real-time traffic integration, driver mobile app, and predictive ETA.",
-  //   stack: ["React Native", "Go", "PostGIS", "Mapbox"],
-  //   duration: "10 months",
-  //   status: "LIVE",
-  // },
 ];
 
 const services = [
@@ -208,30 +83,42 @@ const stats = [
 ];
 
 export default function SoftwareClient() {
+  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen((v) => {
-      document.body.style.overflow = v ? "" : "hidden";
-      return !v;
-    });
-  };
-
-  const closeMobileMenu = () => {
-    setMobileMenuOpen(false);
-    document.body.style.overflow = "";
-  };
-
-  // close on route/hash changes just in case
   useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Lock body scroll when menu open + auto-close on desktop resize
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    const handleResize = () => {
+      if (window.innerWidth > 900 && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+        document.body.style.overflow = "";
+      }
+    };
+    window.addEventListener("resize", handleResize);
     return () => {
+      window.removeEventListener("resize", handleResize);
       document.body.style.overflow = "";
     };
-  }, []);
+  }, [mobileMenuOpen]);
+
+  const toggleMobileMenu = () => setMobileMenuOpen((v) => !v);
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
     <>
-      <style>{`
+      <style jsx global>{`
         :root {
           --bg: #050706;
           --panel: #0a0e0c;
@@ -249,7 +136,10 @@ export default function SoftwareClient() {
           --font-mono: "IBM Plex Mono", monospace;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
+        html {
+          scroll-behavior: smooth;
+          overflow-x: hidden;
+        }
         body {
           background: var(--bg);
           color: var(--white);
@@ -263,7 +153,8 @@ export default function SoftwareClient() {
         img, svg { display: block; max-width: 100%; }
         .mono { font-family: var(--font-mono); }
         .wrap { max-width: 1360px; margin: 0 auto; padding: 0 48px; }
-        @media (max-width: 720px) { .wrap { padding: 0 24px; } }
+        @media (max-width: 900px) { .wrap { padding: 0 24px; } }
+        @media (max-width: 480px) { .wrap { padding: 0 18px; } }
 
         .grain {
           position: fixed; inset: 0; pointer-events: none; z-index: 999;
@@ -271,19 +162,32 @@ export default function SoftwareClient() {
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
 
-        /* NAV */
+        /* ---------- NAV (fixed on scroll, like landing) ---------- */
         .topnav {
-          position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+          position: fixed;
+          top: 0; left: 0; right: 0;
+          z-index: 500;
+          padding: 26px 0;
+          background: transparent;
+          border-bottom: 1px solid transparent;
+          transition: background 0.4s ease, padding 0.4s ease,
+            border-color 0.4s ease, backdrop-filter 0.4s ease;
+        }
+        .topnav.scrolled {
           padding: 16px 0;
           background: rgba(5, 7, 6, 0.72);
           backdrop-filter: blur(16px) saturate(140%);
           -webkit-backdrop-filter: blur(16px) saturate(140%);
           border-bottom: 1px solid var(--line);
         }
-        .navrow { display: flex; align-items: center; justify-content: space-between; }
+        .navrow {
+          display: flex; align-items: center; justify-content: space-between;
+          gap: 20px;
+        }
         .logo {
           font-family: var(--font-head); font-weight: 700; font-size: 20px;
           letter-spacing: 0.04em; display: flex; align-items: center; gap: 9px;
+          flex-shrink: 0;
         }
         .logo .dot {
           width: 7px; height: 7px; background: var(--emerald-bright); border-radius: 50%;
@@ -315,6 +219,9 @@ export default function SoftwareClient() {
         .burger {
           display: none; flex-direction: column; gap: 5px;
           cursor: pointer; z-index: 600;
+          padding: 8px; margin: -8px;
+          background: transparent; border: none;
+          flex-shrink: 0;
         }
         .burger span {
           width: 26px; height: 1px; background: var(--white);
@@ -329,19 +236,21 @@ export default function SoftwareClient() {
           .burger { display: flex; }
         }
 
-        /* mobile menu */
+        /* mobile menu — scrollable */
         .mobile-menu {
           position: fixed; inset: 0; background: var(--bg); z-index: 490;
-          display: flex; flex-direction: column; justify-content: center;
-          padding: 0 32px;
+          display: flex; flex-direction: column; justify-content: flex-start;
+          padding: 100px 24px 40px;
           transform: translateY(-100%);
           transition: transform 0.5s cubic-bezier(0.7, 0, 0.2, 1);
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
         }
         .mobile-menu.open { transform: translateY(0); }
         .mobile-menu a {
-          font-family: var(--font-head); font-size: 38px; font-weight: 600;
-          padding: 14px 0; border-bottom: 1px solid var(--line);
-          color: var(--white);
+          font-family: var(--font-head); font-size: 32px; font-weight: 600;
+          padding: 16px 0; border-bottom: 1px solid var(--line);
+          color: var(--white); line-height: 1.1; flex-shrink: 0;
         }
         .mobile-menu .mm-contact {
           margin-top: 28px; color: var(--emerald-bright);
@@ -349,13 +258,23 @@ export default function SoftwareClient() {
           border-bottom: none;
         }
         @media (max-width: 480px) {
-          .mobile-menu a { font-size: 30px; padding: 12px 0; }
+          .mobile-menu { padding: 88px 20px 32px; }
+          .mobile-menu a { font-size: 26px; padding: 14px 0; }
+        }
+        @media (max-width: 360px) {
+          .mobile-menu a { font-size: 22px; }
         }
 
         /* PAGE HERO */
         .page-hero {
           position: relative; padding: 200px 0 120px; overflow: hidden;
           border-bottom: 1px solid var(--line);
+        }
+        @media (max-width: 900px) {
+          .page-hero { padding: 150px 0 80px; }
+        }
+        @media (max-width: 480px) {
+          .page-hero { padding: 130px 0 64px; }
         }
         .page-hero-bg {
           position: absolute; inset: 0; z-index: 0;
@@ -377,48 +296,80 @@ export default function SoftwareClient() {
           mask-image: radial-gradient(
             ellipse 70% 60% at 50% 40%, black, transparent 75%
           );
+          -webkit-mask-image: radial-gradient(
+            ellipse 70% 60% at 50% 40%, black, transparent 75%
+          );
         }
         .page-hero-inner { position: relative; z-index: 2; }
         .eyebrow-mono {
           font-family: var(--font-mono); font-size: 12.5px; color: var(--gray);
           letter-spacing: 0.06em; display: flex; align-items: center; gap: 10px;
+          flex-wrap: wrap;
         }
         .eyebrow-mono .bar {
           width: 26px; height: 1px; background: var(--emerald); display: inline-block;
+          flex-shrink: 0;
+        }
+        @media (max-width: 480px) {
+          .eyebrow-mono { font-size: 10.5px; letter-spacing: 0.04em; }
         }
         .page-title {
           font-family: var(--font-head); font-weight: 700;
-          font-size: clamp(48px, 9vw, 128px); line-height: 0.96;
+          font-size: clamp(42px, 9vw, 128px); line-height: 0.96;
           letter-spacing: -0.025em; margin-top: 28px; max-width: 1200px;
+          word-break: break-word;
+        }
+        @media (max-width: 480px) {
+          .page-title { font-size: clamp(36px, 11vw, 64px); }
         }
         .page-title em { color: var(--emerald-bright); font-style: normal; }
         .page-lede {
           margin-top: 40px; max-width: 680px; color: var(--gray);
           font-size: 17px; line-height: 1.65;
         }
+        @media (max-width: 480px) {
+          .page-lede { font-size: 15px; margin-top: 28px; }
+        }
         .page-hero-meta {
           display: flex; gap: 56px; margin-top: 64px; flex-wrap: wrap;
           padding-top: 40px; border-top: 1px solid var(--line);
         }
+        @media (max-width: 900px) {
+          .page-hero-meta { gap: 32px; margin-top: 48px; padding-top: 28px; }
+        }
+        @media (max-width: 480px) {
+          .page-hero-meta { gap: 24px; margin-top: 32px; }
+        }
+        .phm-item { min-width: 0; }
         .phm-item .phm-val {
           font-family: var(--font-head); font-weight: 600;
           font-size: 28px; letter-spacing: -0.01em;
+        }
+        @media (max-width: 480px) {
+          .phm-item .phm-val { font-size: 22px; }
         }
         .phm-item .phm-label {
           font-family: var(--font-mono); font-size: 11px;
           color: var(--gray-dim); letter-spacing: 0.06em; margin-top: 8px;
         }
+        @media (max-width: 480px) {
+          .phm-item .phm-label { font-size: 9.5px; }
+        }
 
         /* SECTION SHARED */
         section { position: relative; padding: 130px 0; }
-        @media (max-width: 720px) { section { padding: 88px 0; } }
+        @media (max-width: 900px) { section { padding: 90px 0; } }
+        @media (max-width: 480px) { section { padding: 72px 0; } }
         .section-head {
           display: flex; justify-content: space-between; align-items: flex-end;
           gap: 40px; margin-bottom: 72px; flex-wrap: wrap;
         }
+        @media (max-width: 900px) {
+          .section-head { margin-bottom: 48px; gap: 20px; }
+        }
         .section-title {
           font-family: var(--font-head); font-weight: 600;
-          font-size: clamp(30px, 4.4vw, 54px); letter-spacing: -0.01em;
+          font-size: clamp(28px, 4.4vw, 54px); letter-spacing: -0.01em;
           line-height: 1.08; max-width: 720px;
         }
         .section-note {
@@ -460,7 +411,7 @@ export default function SoftwareClient() {
         .product-card > * { position: relative; z-index: 1; }
         .product-top {
           display: flex; justify-content: space-between;
-          align-items: flex-start; margin-bottom: 28px;
+          align-items: flex-start; margin-bottom: 28px; gap: 12px; flex-wrap: wrap;
         }
         .product-index {
           font-family: var(--font-mono); color: var(--gray-dim); font-size: 13px;
@@ -471,11 +422,13 @@ export default function SoftwareClient() {
           border: 1px solid var(--emerald-dim);
           padding: 5px 10px; border-radius: 2px;
           background: rgba(31, 174, 122, 0.06);
+          white-space: nowrap;
         }
         .product-name {
           font-family: var(--font-head); font-weight: 700;
           font-size: clamp(28px, 3vw, 38px); letter-spacing: -0.02em;
           line-height: 1;
+          word-break: break-word;
         }
         .product-tagline {
           font-family: var(--font-head); font-weight: 500;
@@ -510,6 +463,8 @@ export default function SoftwareClient() {
           font-weight: 500; white-space: nowrap;
           transition: background 0.3s ease, transform 0.3s ease;
           display: inline-flex; align-items: center; gap: 8px;
+          flex: 0 0 auto;
+          max-width: 100%;
         }
         .product-cta:hover {
           background: var(--emerald-bright); transform: translateY(-2px);
@@ -527,16 +482,23 @@ export default function SoftwareClient() {
         .product-external {
           color: var(--emerald-bright);
           display: inline-flex; align-items: center; gap: 6px;
+          word-break: break-all;
         }
         .product-external::before {
           content: "";
           width: 5px; height: 5px; background: var(--emerald-bright);
           border-radius: 50%;
+          flex-shrink: 0;
         }
         @media (max-width: 860px) {
           .product-grid { grid-template-columns: 1fr; }
           .product-card { padding: 36px 28px; }
           .product-features { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+          .product-card { padding: 28px 20px; }
+          .product-bottom { justify-content: stretch; }
+          .product-cta { width: 100%; justify-content: center; }
         }
 
         /* ---- CLIENT PROJECTS ---- */
@@ -564,6 +526,7 @@ export default function SoftwareClient() {
           font-family: var(--font-mono); font-size: 11.5px;
           color: var(--gray); letter-spacing: 0.06em;
           display: flex; align-items: center; gap: 8px;
+          flex-wrap: wrap;
         }
         .project-client::before {
           content: ""; width: 5px; height: 5px;
@@ -573,6 +536,7 @@ export default function SoftwareClient() {
           font-family: var(--font-head); font-weight: 700;
           font-size: clamp(26px, 3vw, 36px); letter-spacing: -0.02em;
           line-height: 1.05; margin-top: 16px;
+          word-break: break-word;
         }
         .project-type {
           color: var(--gray); font-size: 14px; margin-top: 12px;
@@ -601,6 +565,7 @@ export default function SoftwareClient() {
           padding-top: 22px; border-top: 1px solid var(--line);
           font-family: var(--font-mono); font-size: 11.5px;
           color: var(--gray-dim); letter-spacing: 0.05em;
+          gap: 12px; flex-wrap: wrap;
         }
         .project-status {
           display: flex; align-items: center; gap: 8px;
@@ -610,6 +575,7 @@ export default function SoftwareClient() {
           content: ""; width: 6px; height: 6px;
           background: var(--emerald-bright); border-radius: 50%;
           box-shadow: 0 0 8px 2px rgba(63, 224, 166, 0.6);
+          flex-shrink: 0;
         }
         @media (max-width: 900px) {
           .project-row {
@@ -644,6 +610,9 @@ export default function SoftwareClient() {
         }
         @media (max-width: 960px) { .services-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 600px) { .services-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 480px) {
+          .service-cell { padding: 32px 24px; min-height: auto; }
+        }
 
         /* ---- STATS BAND ---- */
         .stats-band {
@@ -669,15 +638,21 @@ export default function SoftwareClient() {
           .stats-grid { grid-template-columns: 1fr 1fr; }
           .stat-cell { padding: 40px 24px; }
         }
+        @media (max-width: 480px) {
+          .stat-cell { padding: 32px 20px; }
+          .stat-val { font-size: 32px; }
+        }
 
         /* ---- CTA ---- */
         .cta-section {
           background: var(--graphite); border-top: 1px solid var(--line);
           text-align: center; padding: 130px 0;
         }
+        @media (max-width: 900px) { .cta-section { padding: 90px 0; } }
+        @media (max-width: 480px) { .cta-section { padding: 72px 0; } }
         .cta-title {
           font-family: var(--font-head); font-weight: 600;
-          font-size: clamp(34px, 5.4vw, 68px); letter-spacing: -0.02em;
+          font-size: clamp(30px, 5.4vw, 68px); letter-spacing: -0.02em;
           line-height: 1.05; max-width: 900px; margin: 0 auto;
         }
         .cta-title em { color: var(--emerald-bright); font-style: normal; }
@@ -685,9 +660,16 @@ export default function SoftwareClient() {
           color: var(--gray); font-size: 16px; line-height: 1.65;
           max-width: 560px; margin: 28px auto 0;
         }
+        @media (max-width: 480px) {
+          .cta-sub { font-size: 14.5px; margin-top: 20px; }
+        }
         .cta-actions {
           display: flex; gap: 14px; justify-content: center;
           margin-top: 44px; flex-wrap: wrap;
+          padding: 0 24px;
+        }
+        @media (max-width: 480px) {
+          .cta-actions { margin-top: 32px; gap: 10px; }
         }
         .btn {
           font-size: 13.5px; padding: 15px 28px; border-radius: 2px;
@@ -695,6 +677,15 @@ export default function SoftwareClient() {
           transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
             background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
           display: inline-block;
+          text-align: center;
+          white-space: nowrap;
+          flex: 0 0 auto;
+        }
+        @media (max-width: 480px) {
+          .cta-actions .btn {
+            flex: 1 1 100%;
+            padding: 14px 20px;
+          }
         }
         .btn-solid { background: var(--white); color: var(--bg); }
         .btn-solid:hover {
@@ -708,12 +699,22 @@ export default function SoftwareClient() {
 
         /* ---- FOOTER ---- */
         footer { padding: 70px 0 40px; border-top: 1px solid var(--line); }
+        @media (max-width: 900px) { footer { padding: 50px 0 30px; } }
         .footer-top {
           display: grid; grid-template-columns: 1.4fr repeat(4, 1fr);
           gap: 40px; padding-bottom: 60px;
           border-bottom: 1px solid var(--line);
         }
-        @media (max-width: 860px) { .footer-top { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 900px) {
+          .footer-top {
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            padding-bottom: 40px;
+          }
+        }
+        @media (max-width: 480px) {
+          .footer-top { grid-template-columns: 1fr; gap: 28px; }
+        }
         .footer-col h4 {
           font-family: var(--font-mono); font-size: 11.5px;
           color: var(--gray-dim); letter-spacing: 0.06em; margin-bottom: 18px;
@@ -732,12 +733,15 @@ export default function SoftwareClient() {
           color: var(--gray-dim); font-size: 12.5px;
           font-family: var(--font-mono); flex-wrap: wrap; gap: 12px;
         }
+        @media (max-width: 480px) {
+          .footer-bottom { flex-direction: column; align-items: flex-start; }
+        }
       `}</style>
 
       <div className="grain"></div>
 
       {/* NAV */}
-      <header className="topnav">
+      <header className={`topnav ${scrolled ? "scrolled" : ""}`}>
         <div className="wrap navrow">
           <Link href="/" className="logo">
             <span className="dot"></span>DURXAN
@@ -747,15 +751,13 @@ export default function SoftwareClient() {
             <Link href="/autonomous">Autonomous Systems</Link>
             <Link href="/software">Software</Link>
             <Link href="/#industries">Industries</Link>
-            <Link href="/#research">Research</Link>
             <Link href="/#company">Company</Link>
-            <Link href="/#insights">Insights</Link>
             <Link href="/#careers">Careers</Link>
           </nav>
           <Link href="/#contact" className="nav-cta">
             Contact
           </Link>
-          <div
+          <button
             className={`burger ${mobileMenuOpen ? "open" : ""}`}
             onClick={toggleMobileMenu}
             aria-label="Toggle menu"
@@ -764,7 +766,7 @@ export default function SoftwareClient() {
             <span></span>
             <span></span>
             <span></span>
-          </div>
+          </button>
         </div>
       </header>
 
@@ -781,9 +783,6 @@ export default function SoftwareClient() {
         </Link>
         <Link href="/#industries" onClick={closeMobileMenu}>
           Industries
-        </Link>
-        <Link href="/#research" onClick={closeMobileMenu}>
-          Research
         </Link>
         <Link href="/#company" onClick={closeMobileMenu}>
           Company
@@ -821,15 +820,15 @@ export default function SoftwareClient() {
           </p>
           <div className="page-hero-meta">
             <div className="phm-item">
-              <div className="phm-val">4</div>
+              <div className="phm-val">1</div>
               <div className="phm-label">DURXAN PRODUCTS</div>
             </div>
             <div className="phm-item">
-              <div className="phm-val">60+</div>
+              <div className="phm-val">1</div>
               <div className="phm-label">CLIENT PROJECTS SHIPPED</div>
             </div>
             <div className="phm-item">
-              <div className="phm-val">40+</div>
+              <div className="phm-val">1</div>
               <div className="phm-label">COUNTRIES SERVED</div>
             </div>
             <div className="phm-item">
@@ -840,7 +839,7 @@ export default function SoftwareClient() {
         </div>
       </section>
 
-      {/* ---- DURXAN PRODUCTS ---- */}
+      {/* DURXAN PRODUCTS */}
       <section className="products-section" id="products">
         <div className="wrap">
           <div className="section-head">
@@ -894,7 +893,7 @@ export default function SoftwareClient() {
         </div>
       </section>
 
-      {/* ---- STATS BAND ---- */}
+      {/* STATS BAND */}
       <section className="stats-band" style={{ padding: 0 }}>
         <div className="stats-grid">
           {stats.map((s) => (
@@ -906,7 +905,7 @@ export default function SoftwareClient() {
         </div>
       </section>
 
-      {/* ---- CLIENT PROJECTS ---- */}
+      {/* CLIENT PROJECTS */}
       <section className="clients-section" id="clients">
         <div className="wrap">
           <div className="section-head">
@@ -954,7 +953,7 @@ export default function SoftwareClient() {
         </div>
       </section>
 
-      {/* ---- SERVICES ---- */}
+      {/* SERVICES */}
       <section className="services-section" id="services">
         <div className="wrap">
           <div className="section-head">
@@ -984,7 +983,7 @@ export default function SoftwareClient() {
         </div>
       </section>
 
-      {/* ---- CTA ---- */}
+      {/* CTA */}
       <section className="cta-section" id="contact">
         <div className="wrap">
           <h2 className="cta-title">
@@ -1026,39 +1025,13 @@ export default function SoftwareClient() {
             </div>
             <div className="footer-col">
               <h4>PRODUCTS</h4>
-              <a
-                href="https://stockline.app"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Stockline ↗
-              </a>
-              <a
-                href="https://ledgerly.io"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Ledgerly ↗
-              </a>
-              <a
-                href="https://aegisshield.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                AegisShield ↗
-              </a>
-              <a
-                href="https://flowdesk.app"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                FlowDesk ↗
+              <a href="#" target="_blank" rel="noopener noreferrer">
+                ClaukkInventory ↗
               </a>
             </div>
             <div className="footer-col">
               <h4>COMPANY</h4>
               <Link href="/#company">About</Link>
-              <Link href="/#research">Research</Link>
               <Link href="/#careers">Careers</Link>
             </div>
             <div className="footer-col">
@@ -1069,7 +1042,7 @@ export default function SoftwareClient() {
             </div>
           </div>
           <div className="footer-bottom">
-            <span>© 2026 DURXAN. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} DURXAN. All rights reserved.</span>
             <span>ENGINEERED FOR THE REAL WORLD</span>
           </div>
         </div>

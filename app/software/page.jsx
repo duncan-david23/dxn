@@ -1,12 +1,13 @@
 import SoftwareClient from "../../components/SoftwareClient";
+import PageGate from "../../components/PageGate";
 
 export const metadata = {
   title: "Software — DURXAN | Products & Client Engineering",
   description:
-    "DURXAN builds its own software products — inventory, bookkeeping, cybersecurity, and business tools — and engineers custom software for clients. Explore our platforms or see client work.",
+    "DURXAN builds its own software products — Accounting, Artificial Intelligence, cybersecurity, and business tools — and engineers custom software for clients. Explore our platforms or see client work.",
   keywords: [
-    "inventory software",
-    "bookkeeping software",
+    "accounting software",
+    "artificial intelligence software",
     "cybersecurity software",
     "business software",
     "custom software development",
@@ -32,5 +33,9 @@ export const metadata = {
 };
 
 export default function SoftwarePage() {
-  return <SoftwareClient />;
+  return (
+   
+      <SoftwareClient />
+  
+  );
 }

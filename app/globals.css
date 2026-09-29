@@ -24,3 +24,138 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ---------- DURXAN LOADER ---------- */
+.durxan-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(
+      ellipse 70% 60% at 50% 40%,
+      rgba(31, 174, 122, 0.10),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 80% 60% at 20% 90%,
+      rgba(18, 22, 19, 0.6),
+      transparent 70%
+    ),
+    rgba(5, 7, 6, 0.92);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  animation: durxanFadeIn 0.35s ease forwards;
+}
+
+/* Hide the unstyled icons before hydration — no flash */
+.durxan-loader-icon svg {
+  opacity: 0;
+}
+
+.durxan-loader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 0 24px;
+}
+.durxan-loader-mark {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.durxan-loader-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(63, 224, 166, 0.14);
+}
+.durxan-loader-ring--outer {
+  animation: durxanSpin 4s linear infinite;
+  border-top-color: rgba(63, 224, 166, 0.55);
+  border-right-color: rgba(63, 224, 166, 0.18);
+}
+.durxan-loader-ring--mid {
+  inset: 14px;
+  border-top-color: rgba(63, 224, 166, 0.4);
+  border-left-color: rgba(63, 224, 166, 0.14);
+  animation: durxanSpin 2.6s linear infinite reverse;
+}
+.durxan-loader-ring--inner {
+  inset: 28px;
+  border-right-color: rgba(63, 224, 166, 0.35);
+  animation: durxanSpin 1.8s linear infinite;
+}
+.durxan-loader-icon {
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+.durxan-loader-icon svg {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: absolute;
+  inset: 0;
+  color: #3fe0a6;
+}
+.durxan-loader-icon svg.active {
+  opacity: 1;
+  transform: scale(1);
+}
+.durxan-loader-wordmark {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.18em;
+  color: #f3f5f2;
+}
+.durxan-loader-wordmark::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: #3fe0a6;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 2px rgba(63, 224, 166, 0.6);
+  animation: durxanPulse 1.4s ease-in-out infinite;
+}
+.durxan-loader-sub {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  color: #5c6560;
+  text-transform: uppercase;
+}
+.durxan-loader-sub span {
+  color: #3fe0a6;
+}
+
+@keyframes durxanSpin {
+  to { transform: rotate(360deg); }
+}
+@keyframes durxanPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@keyframes durxanFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 480px) {
+  .durxan-loader-mark { width: 96px; height: 96px; }
+  .durxan-loader-icon { width: 40px; height: 40px; }
+  .durxan-loader-wordmark { font-size: 14px; }
+  .durxan-loader-sub { font-size: 9.5px; }
+}

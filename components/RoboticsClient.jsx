@@ -160,15 +160,29 @@ export default function RoboticsClient() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-    document.body.style.overflow = mobileMenuOpen ? "" : "hidden";
-  };
+  // lock body scroll + close on desktop resize
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
 
-  const closeMobileMenu = () => {
-    setMobileMenuOpen(false);
-    document.body.style.overflow = "";
-  };
+    const handleResize = () => {
+      if (window.innerWidth > 900 && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+        document.body.style.overflow = "";
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
+  const toggleMobileMenu = () => setMobileMenuOpen((v) => !v);
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
     <>
@@ -190,7 +204,10 @@ export default function RoboticsClient() {
           --font-mono: "IBM Plex Mono", monospace;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
+        html {
+          scroll-behavior: smooth;
+          overflow-x: hidden;
+        }
         body {
           background: var(--bg);
           color: var(--white);
@@ -204,7 +221,8 @@ export default function RoboticsClient() {
         img, svg { display: block; max-width: 100%; }
         .mono { font-family: var(--font-mono); }
         .wrap { max-width: 1360px; margin: 0 auto; padding: 0 48px; }
-        @media (max-width: 720px) { .wrap { padding: 0 24px; } }
+        @media (max-width: 900px) { .wrap { padding: 0 24px; } }
+        @media (max-width: 480px) { .wrap { padding: 0 18px; } }
 
         .grain {
           position: fixed; inset: 0; pointer-events: none; z-index: 999;
@@ -227,10 +245,14 @@ export default function RoboticsClient() {
           -webkit-backdrop-filter: blur(16px) saturate(140%);
           border-bottom: 1px solid var(--line);
         }
-        .navrow { display: flex; align-items: center; justify-content: space-between; }
+        .navrow {
+          display: flex; align-items: center; justify-content: space-between;
+          gap: 20px;
+        }
         .logo {
           font-family: var(--font-head); font-weight: 700; font-size: 20px;
           letter-spacing: 0.04em; display: flex; align-items: center; gap: 9px;
+          flex-shrink: 0;
         }
         .logo .dot {
           width: 7px; height: 7px; background: var(--emerald-bright); border-radius: 50%;
@@ -260,38 +282,61 @@ export default function RoboticsClient() {
         .burger {
           display: none; flex-direction: column; gap: 5px;
           cursor: pointer; z-index: 600;
+          padding: 8px; margin: -8px;
+          background: transparent; border: none;
+          flex-shrink: 0;
         }
         .burger span {
           width: 26px; height: 1px; background: var(--white);
           display: block; transition: 0.3s;
         }
+        .burger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        .burger.open span:nth-child(2) { opacity: 0; }
+        .burger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
         @media (max-width: 900px) {
           nav.primary, .nav-cta { display: none; }
           .burger { display: flex; }
         }
 
+        /* mobile menu — scrollable */
         .mobile-menu {
           position: fixed; inset: 0; background: var(--bg); z-index: 490;
-          display: flex; flex-direction: column; justify-content: center;
-          padding: 0 32px;
+          display: flex; flex-direction: column; justify-content: flex-start;
+          padding: 100px 24px 40px;
           transform: translateY(-100%);
           transition: transform 0.5s cubic-bezier(0.7, 0, 0.2, 1);
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
         }
         .mobile-menu.open { transform: translateY(0); }
         .mobile-menu a {
-          font-family: var(--font-head); font-size: 38px; font-weight: 600;
-          padding: 14px 0; border-bottom: 1px solid var(--line);
-          color: var(--white);
+          font-family: var(--font-head); font-size: 32px; font-weight: 600;
+          padding: 16px 0; border-bottom: 1px solid var(--line);
+          color: var(--white); line-height: 1.1; flex-shrink: 0;
         }
         .mobile-menu .mm-contact {
           margin-top: 28px; color: var(--emerald-bright);
           font-family: var(--font-mono); font-size: 15px;
+          border-bottom: none;
+        }
+        @media (max-width: 480px) {
+          .mobile-menu { padding: 88px 20px 32px; }
+          .mobile-menu a { font-size: 26px; padding: 14px 0; }
+        }
+        @media (max-width: 360px) {
+          .mobile-menu a { font-size: 22px; }
         }
 
         /* ---------- HERO ---------- */
         .page-hero {
           position: relative; padding: 200px 0 120px; overflow: hidden;
           border-bottom: 1px solid var(--line);
+        }
+        @media (max-width: 900px) {
+          .page-hero { padding: 150px 0 80px; }
+        }
+        @media (max-width: 480px) {
+          .page-hero { padding: 130px 0 64px; }
         }
         .page-hero-bg {
           position: absolute; inset: 0; z-index: 0;
@@ -313,48 +358,84 @@ export default function RoboticsClient() {
           mask-image: radial-gradient(
             ellipse 70% 60% at 50% 40%, black, transparent 75%
           );
+          -webkit-mask-image: radial-gradient(
+            ellipse 70% 60% at 50% 40%, black, transparent 75%
+          );
         }
         .page-hero-inner { position: relative; z-index: 2; }
         .eyebrow-mono {
           font-family: var(--font-mono); font-size: 12.5px; color: var(--gray);
           letter-spacing: 0.06em; display: flex; align-items: center; gap: 10px;
+          flex-wrap: wrap;
         }
         .eyebrow-mono .bar {
           width: 26px; height: 1px; background: var(--emerald); display: inline-block;
+          flex-shrink: 0;
+        }
+        @media (max-width: 480px) {
+          .eyebrow-mono { font-size: 10.5px; letter-spacing: 0.04em; }
         }
         .page-title {
           font-family: var(--font-head); font-weight: 700;
-          font-size: clamp(48px, 9vw, 128px); line-height: 0.96;
+          font-size: clamp(42px, 9vw, 128px); line-height: 0.96;
           letter-spacing: -0.025em; margin-top: 28px; max-width: 1200px;
+          word-break: break-word;
+        }
+        @media (max-width: 480px) {
+          .page-title { font-size: clamp(36px, 11vw, 64px); }
         }
         .page-title em { color: var(--emerald-bright); font-style: normal; }
         .page-lede {
           margin-top: 40px; max-width: 680px; color: var(--gray);
           font-size: 17px; line-height: 1.65;
         }
+        @media (max-width: 480px) {
+          .page-lede { font-size: 15px; margin-top: 28px; }
+        }
         .page-hero-meta {
           display: flex; gap: 56px; margin-top: 64px; flex-wrap: wrap;
           padding-top: 40px; border-top: 1px solid var(--line);
         }
+        @media (max-width: 900px) {
+          .page-hero-meta {
+            gap: 32px;
+            margin-top: 48px;
+            padding-top: 28px;
+          }
+        }
+        @media (max-width: 480px) {
+          .page-hero-meta { gap: 24px; margin-top: 32px; }
+        }
+        .phm-item { min-width: 0; }
         .phm-item .phm-val {
           font-family: var(--font-head); font-weight: 600;
           font-size: 28px; letter-spacing: -0.01em;
+        }
+        @media (max-width: 480px) {
+          .phm-item .phm-val { font-size: 22px; }
         }
         .phm-item .phm-label {
           font-family: var(--font-mono); font-size: 11px;
           color: var(--gray-dim); letter-spacing: 0.06em; margin-top: 8px;
         }
+        @media (max-width: 480px) {
+          .phm-item .phm-label { font-size: 9.5px; }
+        }
 
         /* ---------- SECTION SHARED ---------- */
         section { position: relative; padding: 130px 0; }
-        @media (max-width: 720px) { section { padding: 88px 0; } }
+        @media (max-width: 900px) { section { padding: 90px 0; } }
+        @media (max-width: 480px) { section { padding: 72px 0; } }
         .section-head {
           display: flex; justify-content: space-between; align-items: flex-end;
           gap: 40px; margin-bottom: 72px; flex-wrap: wrap;
         }
+        @media (max-width: 900px) {
+          .section-head { margin-bottom: 48px; gap: 20px; }
+        }
         .section-title {
           font-family: var(--font-head); font-weight: 600;
-          font-size: clamp(30px, 4.4vw, 54px); letter-spacing: -0.01em;
+          font-size: clamp(28px, 4.4vw, 54px); letter-spacing: -0.01em;
           line-height: 1.08; max-width: 720px;
         }
         .section-note {
@@ -396,7 +477,8 @@ export default function RoboticsClient() {
         .platform-card > * { position: relative; z-index: 1; }
         .platform-top {
           display: flex; justify-content: space-between;
-          align-items: flex-start; margin-bottom: 28px;
+          align-items: flex-start; margin-bottom: 28px; gap: 12px;
+          flex-wrap: wrap;
         }
         .platform-index {
           font-family: var(--font-mono); color: var(--gray-dim); font-size: 13px;
@@ -407,6 +489,7 @@ export default function RoboticsClient() {
           border: 1px solid var(--emerald-dim);
           padding: 5px 10px; border-radius: 2px;
           background: rgba(31, 174, 122, 0.06);
+          white-space: nowrap;
         }
         .platform-name {
           font-family: var(--font-head); font-weight: 700;
@@ -444,6 +527,7 @@ export default function RoboticsClient() {
         .spec-cell {
           background: var(--bg); padding: 16px 12px;
           display: flex; flex-direction: column; gap: 6px;
+          min-width: 0;
         }
         .spec-label {
           font-family: var(--font-mono); font-size: 10px;
@@ -469,12 +553,19 @@ export default function RoboticsClient() {
           content: ""; width: 6px; height: 6px;
           background: var(--emerald-bright); border-radius: 50%;
           box-shadow: 0 0 8px 2px rgba(63, 224, 166, 0.6);
+          flex-shrink: 0;
         }
         @media (max-width: 900px) {
           .platform-grid { grid-template-columns: 1fr; }
           .platform-card { padding: 36px 28px; }
           .platform-features { grid-template-columns: 1fr; }
           .spec-sheet { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 480px) {
+          .platform-card { padding: 28px 20px; }
+          .platform-features li { font-size: 11px; }
+          .spec-cell { padding: 12px 10px; }
+          .spec-value { font-size: 13.5px; }
         }
 
         /* ---------- CAPABILITIES ---------- */
@@ -503,6 +594,9 @@ export default function RoboticsClient() {
         }
         @media (max-width: 960px) { .cap-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 600px) { .cap-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 480px) {
+          .cap-cell { padding: 32px 24px; min-height: auto; }
+        }
 
         /* ---------- STATS BAND ---------- */
         .stats-band {
@@ -528,6 +622,10 @@ export default function RoboticsClient() {
           .stats-grid { grid-template-columns: 1fr 1fr; }
           .stat-cell { padding: 40px 24px; }
         }
+        @media (max-width: 480px) {
+          .stat-cell { padding: 32px 20px; }
+          .stat-val { font-size: 32px; }
+        }
 
         /* ---------- ARCHITECTURE ---------- */
         .arch-section .wrap {
@@ -535,7 +633,7 @@ export default function RoboticsClient() {
           gap: 80px; align-items: center;
         }
         @media (max-width: 960px) {
-          .arch-section .wrap { grid-template-columns: 1fr; gap: 56px; }
+          .arch-section .wrap { grid-template-columns: 1fr; gap: 48px; }
         }
         .arch-copy p {
           color: var(--gray); font-size: 15.5px; line-height: 1.7;
@@ -548,13 +646,23 @@ export default function RoboticsClient() {
           display: flex; justify-content: space-between;
           padding: 16px 0; border-bottom: 1px solid var(--line);
           font-family: var(--font-mono); font-size: 13px; color: var(--gray);
+          gap: 12px;
         }
-        .arch-item span:last-child { color: var(--gray-dim); }
+        .arch-item span:last-child {
+          color: var(--gray-dim);
+          text-align: right;
+        }
+        @media (max-width: 480px) {
+          .arch-item { font-size: 11.5px; }
+        }
         .arch-visual {
           position: relative; aspect-ratio: 1 / 0.85;
+          max-width: 520px;
+          margin: 0 auto;
+          width: 100%;
         }
 
-        /* ---------- CTA ---------- */
+        /* ---------- CTA (kept for reuse, hidden on robotics) ---------- */
         .cta-section {
           background: var(--graphite); border-top: 1px solid var(--line);
           text-align: center; padding: 130px 0;
@@ -579,6 +687,7 @@ export default function RoboticsClient() {
           transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
             background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
           display: inline-block;
+          text-align: center;
         }
         .btn-solid { background: var(--white); color: var(--bg); }
         .btn-solid:hover {
@@ -592,12 +701,25 @@ export default function RoboticsClient() {
 
         /* ---------- FOOTER ---------- */
         footer { padding: 70px 0 40px; border-top: 1px solid var(--line); }
+        @media (max-width: 900px) { footer { padding: 50px 0 30px; } }
         .footer-top {
           display: grid; grid-template-columns: 1.4fr repeat(4, 1fr);
           gap: 40px; padding-bottom: 60px;
           border-bottom: 1px solid var(--line);
         }
-        @media (max-width: 860px) { .footer-top { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 900px) {
+          .footer-top {
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            padding-bottom: 40px;
+          }
+        }
+        @media (max-width: 480px) {
+          .footer-top {
+            grid-template-columns: 1fr;
+            gap: 28px;
+          }
+        }
         .footer-col h4 {
           font-family: var(--font-mono); font-size: 11.5px;
           color: var(--gray-dim); letter-spacing: 0.06em; margin-bottom: 18px;
@@ -616,6 +738,12 @@ export default function RoboticsClient() {
           color: var(--gray-dim); font-size: 12.5px;
           font-family: var(--font-mono); flex-wrap: wrap; gap: 12px;
         }
+        @media (max-width: 480px) {
+          .footer-bottom {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+        }
       `}</style>
 
       <div className="grain"></div>
@@ -631,19 +759,22 @@ export default function RoboticsClient() {
             <Link href="/autonomous">Autonomous Systems</Link>
             <Link href="/software">Software</Link>
             <Link href="/#industries">Industries</Link>
-            <Link href="/#research">Research</Link>
             <Link href="/#company">Company</Link>
-            <Link href="/#insights">Insights</Link>
             <Link href="/#careers">Careers</Link>
           </nav>
           <Link href="/#contact" className="nav-cta">
             Contact
           </Link>
-          <div className="burger" onClick={toggleMobileMenu}>
+          <button
+            className={`burger ${mobileMenuOpen ? "open" : ""}`}
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+          >
             <span></span>
             <span></span>
             <span></span>
-          </div>
+          </button>
         </div>
       </header>
 
@@ -659,9 +790,6 @@ export default function RoboticsClient() {
         </Link>
         <Link href="/#industries" onClick={closeMobileMenu}>
           Industries
-        </Link>
-        <Link href="/#research" onClick={closeMobileMenu}>
-          Research
         </Link>
         <Link href="/#company" onClick={closeMobileMenu}>
           Company
@@ -818,9 +946,7 @@ export default function RoboticsClient() {
             <div className="section-label">
               <span className="bar"></span>ARCHITECTURE
             </div>
-            <h2 className="section-title">
-              Built on DURXAN OS.
-            </h2>
+            <h2 className="section-title">Built on DURXAN OS.</h2>
             <p>
               Every robot runs on the same real-time, safety-rated operating
               system — from actuators up through perception, autonomy, and
@@ -905,27 +1031,6 @@ export default function RoboticsClient() {
         </div>
       </section>
 
-      {/* CTA */}
-      {/* <section className="cta-section" id="contact">
-        <div className="wrap">
-          <h2 className="cta-title">
-            Deploy a robot. Or <em>build</em> one with us.
-          </h2>
-          <p className="cta-sub">
-            Whether you're evaluating a DURXAN platform or commissioning a
-            custom robotics program, our engineering team is ready.
-          </p>
-          <div className="cta-actions">
-            <Link href="/#contact" className="btn btn-solid">
-              Start a Conversation
-            </Link>
-            <Link href="#platforms" className="btn btn-ghost">
-              Explore Our Platforms
-            </Link>
-          </div>
-        </div>
-      </section> */}
-
       {/* FOOTER */}
       <footer>
         <div className="wrap">
@@ -955,7 +1060,6 @@ export default function RoboticsClient() {
             <div className="footer-col">
               <h4>COMPANY</h4>
               <Link href="/#company">About</Link>
-              <Link href="/#research">Research</Link>
               <Link href="/#careers">Careers</Link>
             </div>
             <div className="footer-col">

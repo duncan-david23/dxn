@@ -1,4 +1,5 @@
 import RoboticsClient from "../../components/RoboticsClient";
+import PageGate from "../../components/PageGate";
 
 export const metadata = {
   title: "Robotics — DURXAN | Machines That Perceive, Decide, and Act",
@@ -32,5 +33,9 @@ export const metadata = {
 };
 
 export default function RoboticsPage() {
-  return <RoboticsClient />;
+  return (
+   
+      <RoboticsClient />
+   
+  );
 }
